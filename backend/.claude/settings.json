@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": {
+    "grillme@grillme-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "grillme-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "Jekudy/grillme-skill"
+      }
+    }
+  }
+}
