@@ -232,6 +232,42 @@ Laravel's container wires it automatically; no manual resolution needed.
   syntactically valid but no matching `reference_payments` row exists
   (without `fields` — see Domain contract below).
 
+## Test-fixture endpoints (tooling, not part of SPEC.md)
+
+SPEC.md never says where a run's ground-truth data comes from — it assumes
+a reference payment already exists. These two endpoints exist purely so the
+frontend can create and fetch that ground truth; they carry no fraud-scenario
+logic and are not covered by `spec-compliance`.
+
+- `POST /api/reference-payments` — creates a new test run. Body: all fields
+  optional (`address`, `amount`, `network`, `allowed_scripts`) — any field
+  left out is filled in by `ReferencePaymentGenerator` with a random,
+  clearly-fictitious value (never something that could pass as a real
+  address). Response `201`:
+  ```json
+  {
+    "run_id": "uuid",
+    "address": "...",
+    "amount": "...",
+    "network": "...",
+    "allowed_scripts": ["..."]
+  }
+  ```
+- `GET /api/reference-payments/{run_id}` — returns the same shape, `200`, or
+  `404` (same error envelope as `POST /api/checks`) if the run doesn't exist.
+- Validation for `POST`: same `422` envelope as `POST /api/checks`;
+  `amount`, if present, uses the same decimal-string regex
+  (`/^\d+(\.\d+)?$/`) as `StoreCheckRequest`.
+- `run_id` here is always server-generated (UUID) — same rule as
+  `request_id` in the checks journal: never accepted from the client.
+- `ReferencePaymentRepository` gains `create(ReferencePayment $payment):
+  void` alongside the existing `findForRun()`.
+- `ReferencePaymentGenerator` (`Domain/Checks/`) is a pure class — no DB, no
+  Laravel — that fills in whichever of `address`/`amount`/`network`/
+  `allowedScripts` weren't supplied. Called only from the `Application`
+  use case that creates a reference payment, never from `CheckRunner` or
+  any `CheckRule` — generation has nothing to do with the comparison logic.
+
 ## Domain contract (canonical)
 
 `.claude/agents/*.md` each quote a working copy of this for standalone use

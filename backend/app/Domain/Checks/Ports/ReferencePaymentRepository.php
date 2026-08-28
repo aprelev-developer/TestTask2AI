@@ -16,4 +16,6 @@ interface ReferencePaymentRepository
      * @throws ReferencePaymentNotFound when `run_id` has no matching row.
      */
     public function findForRun(string $runId): ReferencePayment;
+
+    public function create(ReferencePayment $payment): void;
 }
