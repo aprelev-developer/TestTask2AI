@@ -1,2 +1,14 @@
 .idea/
 .DS_Store
+
+# homework task files (not for submission)
+04 · Домашнее задание №2.pdf
+05 · Материалы к ДЗ №2.pdf
+
+# derived from the homework PDFs — not for the repo, everything else in
+# backend/.claude/ (skills/agents demonstrating the actual work) is tracked
+backend/.claude/skills/hw2-check/
+
+# temporary — analyst's own territory, cluttering git status; user will
+# remove this line themselves when ready to commit it
+ScamTest/
