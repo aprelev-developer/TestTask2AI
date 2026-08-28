@@ -3,9 +3,13 @@ COMPOSE := docker compose
 
 .PHONY: up down restart build migrate fresh test logs sh db-sh pint stan
 
-## Build (if needed) and start backend + db, run migrations automatically.
+## Build (if needed, quietly) and start backend + db, run migrations
+## automatically. Build output is suppressed on purpose — `--build` alone
+## still streams the full build trace even with `-d`; `build --quiet` first
+## keeps this readable for a non-technical teammate, errors still surface.
 up:
-	$(COMPOSE) up -d --build
+	$(COMPOSE) build --quiet
+	$(COMPOSE) up -d
 
 ## Stop and remove containers (keeps the db volume/data).
 down:

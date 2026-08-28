@@ -15,16 +15,20 @@ compose version`). Локально устанавливать PHP, Composer и�
 
 ### Быстрый старт
 
+Команды — из **корня репозитория** (там есть тонкий `Makefile`,
+перенаправляющий сюда через `make -C backend`) или прямо из `backend/` —
+одинаково работают из обеих директорий:
+
 ```bash
-cd backend
 cp .env.example .env   # если .env ещё нет; значения уже настроены под Docker
 make up
 ```
 
-`make up` — это `docker compose up -d --build`: собирает образ backend
-(PHP 8.2 + расширения для Postgres), поднимает Postgres (`db`), дожидается
-его healthcheck'а и **автоматически прогоняет миграции** перед стартом
-сервера — никаких ручных шагов после `make up` не требуется.
+`make up` — это `docker compose build --quiet && docker compose up -d`:
+собирает образ backend (PHP 8.2 + расширения для Postgres) без вывода
+трейса сборки, поднимает Postgres (`db`), дожидается его healthcheck'а и
+**автоматически прогоняет миграции** перед стартом сервера — никаких
+ручных шагов после `make up` не требуется.
 
 Backend слушает `http://localhost:8000` (порт настраивается через
 `APP_PORT` в `.env`, по умолчанию `8000`).
