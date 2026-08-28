@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: scamtest-backend:local
+    env_file:
+      - .env
+    environment:
+      # Force the container-network hostnames regardless of what a locally
+      # edited .env might contain — matches the `db` service below.
+      DB_HOST: db
+      DB_PORT: "5432"
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - scamtest
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: scamtest
+      POSTGRES_USER: scamtest
+      POSTGRES_PASSWORD: scamtest
+    volumes:
+      - scamtest-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scamtest -d scamtest"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - scamtest
+    restart: unless-stopped
+
+networks:
+  scamtest:
+    name: scamtest
+
+volumes:
+  scamtest-db-data:
