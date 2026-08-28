@@ -216,12 +216,17 @@ Laravel's container wires it automatically; no manual resolution needed.
     "result": "Обнаружена подмена",
     "triggered_scenarios": ["7.1"],
     "details": [{"scenario": "7.1", "expected": "...", "actual": "..."}],
-    "incomplete_checks": []
+    "incomplete_checks": [],
+    "incomplete_message": null
   }
   ```
   `result` is always one of the three exact strings from `spec-compliance`.
   `incomplete_checks` lists scenario codes that couldn't be evaluated (§8),
-  present even when `result` already reports a finding.
+  present even when `result` already reports a finding. `incomplete_message`
+  is SPEC.md §8's exact technical message
+  (`"Проверка выполнена не полностью"`) when `incomplete_checks` is
+  non-empty, `null` otherwise — the literal string lives once, in the
+  Resource, never inferred by the frontend from array emptiness.
 - Error response: `{"error": {"message": "...", "fields": {"field": ["..."]}}}`
   — `422` for validation errors (with `fields`); `404` when `run_id` is
   syntactically valid but no matching `reference_payments` row exists

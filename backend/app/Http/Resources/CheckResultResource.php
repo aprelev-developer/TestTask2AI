@@ -30,6 +30,13 @@ final class CheckResultResource extends JsonResource
     ];
 
     /**
+     * SPEC.md §8/§9: the incomplete-check technical message, dictated by
+     * the same rule as STATUS_LABELS — the exact string lives here, once,
+     * not implied by the frontend from an empty/non-empty array.
+     */
+    private const INCOMPLETE_MESSAGE = 'Проверка выполнена не полностью';
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -39,6 +46,9 @@ final class CheckResultResource extends JsonResource
             'triggered_scenarios' => $this->resource->triggeredScenarios,
             'details' => $this->resource->details,
             'incomplete_checks' => $this->resource->incompleteChecks,
+            'incomplete_message' => $this->resource->incompleteChecks === []
+                ? null
+                : self::INCOMPLETE_MESSAGE,
         ];
     }
 }

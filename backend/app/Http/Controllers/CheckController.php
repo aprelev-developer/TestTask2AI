@@ -81,6 +81,14 @@ final class CheckController extends Controller
                             items: new OA\Items(type: 'string'),
                             description: 'Сценарии, которые не удалось технически проверить.'
                         ),
+                        new OA\Property(
+                            property: 'incomplete_message',
+                            type: 'string',
+                            nullable: true,
+                            example: 'Проверка выполнена не полностью',
+                            description: 'SPEC.md §8: точный текст технического сообщения, когда '
+                                .'incomplete_checks не пуст; null, если проверка полная.'
+                        ),
                     ]
                 )
             ),

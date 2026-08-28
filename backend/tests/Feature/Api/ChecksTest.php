@@ -227,6 +227,59 @@ it('returns "Обнаружена подмена" when the QR-decoded address di
 });
 
 // ---------------------------------------------------------------------
+// Incomplete check — SPEC.md §8's literal technical message
+// ---------------------------------------------------------------------
+
+it('returns the exact incomplete_message text when a scenario could not be evaluated', function () {
+    $runId = (string) Str::uuid();
+    seedReferencePayment(['id' => $runId]);
+
+    $payload = validCheckPayload($runId, [
+        'qr_address' => null,
+    ]);
+
+    $response = $this->postJson('/api/checks', $payload);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'incomplete_checks' => ['7.1'],
+            'incomplete_message' => 'Проверка выполнена не полностью',
+        ]);
+});
+
+it('returns a null incomplete_message when every scenario completed', function () {
+    $runId = (string) Str::uuid();
+    seedReferencePayment(['id' => $runId]);
+
+    $response = $this->postJson('/api/checks', validCheckPayload($runId));
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'incomplete_checks' => [],
+            'incomplete_message' => null,
+        ]);
+});
+
+it('accompanies a tampering result with incomplete_message rather than suppressing either', function () {
+    $runId = (string) Str::uuid();
+    seedReferencePayment(['id' => $runId]);
+
+    $payload = validCheckPayload($runId, [
+        'qr_address' => 'addr-qr-substituted-bbbb',
+        'copy_button_value' => null,
+    ]);
+
+    $response = $this->postJson('/api/checks', $payload);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'result' => 'Обнаружена подмена',
+            'incomplete_checks' => ['7.2'],
+            'incomplete_message' => 'Проверка выполнена не полностью',
+        ]);
+});
+
+// ---------------------------------------------------------------------
 // Response contract shape
 // ---------------------------------------------------------------------
 
