@@ -15,7 +15,10 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('run_id');
             $table->uuid('request_id');
-            $table->string('result');
+            // nullable: §8 forbids a positive claim (incl. "clean") when a
+            // scenario is incomplete and nothing else triggered — see
+            // CheckResult/CheckRunner.
+            $table->string('result')->nullable();
             $table->json('triggered_scenarios');
             $table->json('details');
             $table->json('incomplete_checks');

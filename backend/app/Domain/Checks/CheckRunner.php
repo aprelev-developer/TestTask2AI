@@ -71,6 +71,9 @@ final class CheckRunner
         $status = match (true) {
             $tamperingTriggered => CheckStatus::TAMPERING_DETECTED,
             $suspicionTriggered => CheckStatus::SUSPICION,
+            // §8: "Подмена не обнаружена" must never stand bare when a
+            // scenario couldn't be evaluated — no positive claim, not CLEAN.
+            $incompleteChecks !== [] => null,
             default => CheckStatus::CLEAN,
         };
 

@@ -42,7 +42,9 @@ final class CheckResultResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'result' => self::STATUS_LABELS[$this->resource->status->value],
+            'result' => $this->resource->status === null
+                ? null
+                : self::STATUS_LABELS[$this->resource->status->value],
             'triggered_scenarios' => $this->resource->triggeredScenarios,
             'details' => $this->resource->details,
             'incomplete_checks' => $this->resource->incompleteChecks,

@@ -75,7 +75,7 @@ it('resolves to clean when nothing triggered and every scenario completed', func
         ->and($result->incompleteChecks)->toBe([]);
 });
 
-it('does not let an incomplete check stand unflagged when nothing else triggered (no bare "clean" without an incomplete signal)', function () {
+it('does not let an incomplete check stand unflagged when nothing else triggered (status is null, not bare CLEAN)', function () {
     $runner = new CheckRunner([
         new FakeCheckRule('7.1', triggered: false, incomplete: false),
         new FakeCheckRule('7.2', triggered: false, incomplete: true),
@@ -86,13 +86,12 @@ it('does not let an incomplete check stand unflagged when nothing else triggered
 
     $result = $runner->run(Fixtures::checkInput(), Fixtures::referencePayment());
 
-    // The status enum has no 4th "incomplete" case (per the canonical Domain
-    // contract), so CLEAN is the only value it can resolve to here — but the
-    // SPEC forbids showing "Подмена не обнаружена" bare in this situation.
-    // That invariant is only satisfiable if incompleteChecks is populated,
-    // so any consumer of CheckResult MUST branch on incompleteChecks before
-    // ever presenting the CLEAN status to a user.
-    expect($result->status)->toBe(CheckStatus::CLEAN)
+    // Found by backend-breaker: an earlier version resolved this to CLEAN,
+    // which the API layer then mapped straight to "Подмена не обнаружена"
+    // — exactly the bare-clean-with-incomplete-signal SPEC.md §8 forbids.
+    // status is null here: no 4th enum case, no positive claim at all: only
+    // the incomplete-check message (formed from incompleteChecks) speaks.
+    expect($result->status)->toBeNull()
         ->and($result->incompleteChecks)->toBe(['7.2']);
 });
 

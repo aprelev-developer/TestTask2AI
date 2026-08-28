@@ -20,7 +20,7 @@ final readonly class DetectionEvent
         public string $id,
         public string $runId,
         public string $requestId,
-        public CheckStatus $status,
+        public ?CheckStatus $status,
         public array $triggeredScenarios,
         public array $details,
         public array $incompleteChecks,

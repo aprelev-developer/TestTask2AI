@@ -230,7 +230,7 @@ it('returns "Обнаружена подмена" when the QR-decoded address di
 // Incomplete check — SPEC.md §8's literal technical message
 // ---------------------------------------------------------------------
 
-it('returns the exact incomplete_message text when a scenario could not be evaluated', function () {
+it('returns null result and the exact incomplete_message text when nothing triggered but a scenario could not be evaluated', function () {
     $runId = (string) Str::uuid();
     seedReferencePayment(['id' => $runId]);
 
@@ -240,8 +240,11 @@ it('returns the exact incomplete_message text when a scenario could not be evalu
 
     $response = $this->postJson('/api/checks', $payload);
 
+    // backend-breaker found this returning "Подмена не обнаружена" — SPEC.md
+    // §8 forbids that bare claim whenever a scenario is incomplete.
     $response->assertStatus(200)
         ->assertJson([
+            'result' => null,
             'incomplete_checks' => ['7.1'],
             'incomplete_message' => 'Проверка выполнена не полностью',
         ]);
@@ -277,6 +280,36 @@ it('accompanies a tampering result with incomplete_message rather than suppressi
             'incomplete_checks' => ['7.2'],
             'incomplete_message' => 'Проверка выполнена не полностью',
         ]);
+});
+
+// ---------------------------------------------------------------------
+// Raw observation preservation — backend-breaker found Laravel's global
+// TrimStrings middleware silently stripping leading/trailing whitespace
+// before comparison, violating backend-conventions → Domain invariants
+// ("never normalize, trim, ... an observed value").
+// ---------------------------------------------------------------------
+
+it('does not trim leading/trailing whitespace from an observed address before comparing it', function () {
+    $runId = (string) Str::uuid();
+    seedReferencePayment(['id' => $runId]);
+
+    // Same text as displayed_address, differing only by surrounding
+    // whitespace — a naive trim would make these compare equal and hide
+    // exactly this kind of substitution.
+    $payload = validCheckPayload($runId, [
+        'displayed_address' => 'addr-real',
+        'qr_address' => '  addr-real  ',
+    ]);
+
+    $response = $this->postJson('/api/checks', $payload);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'result' => 'Обнаружена подмена',
+        ]);
+
+    expect($response->json('triggered_scenarios'))->toContain('7.1')
+        ->and($response->json('details.0.actual'))->toBe('  addr-real  ');
 });
 
 // ---------------------------------------------------------------------

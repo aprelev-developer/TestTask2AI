@@ -54,8 +54,11 @@ final class CheckController extends Controller
                         new OA\Property(
                             property: 'result',
                             type: 'string',
-                            enum: ['Подмена не обнаружена', 'Есть подозрение', 'Обнаружена подмена'],
-                            description: 'Итоговый статус проверки.'
+                            nullable: true,
+                            enum: ['Подмена не обнаружена', 'Есть подозрение', 'Обнаружена подмена', null],
+                            description: 'Итоговый статус проверки. null, если ничего не сработало, но '
+                                .'проверка неполная — SPEC.md §8 запрещает в этом случае показывать '
+                                .'«Подмена не обнаружена»; см. incomplete_message.'
                         ),
                         new OA\Property(
                             property: 'triggered_scenarios',

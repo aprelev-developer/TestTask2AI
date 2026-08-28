@@ -21,7 +21,7 @@ final class EloquentDetectionEventRepository implements DetectionEventRepository
                 'id' => $event->id,
                 'run_id' => $event->runId,
                 'request_id' => $event->requestId,
-                'result' => $event->status->value,
+                'result' => $event->status?->value,
                 'triggered_scenarios' => $event->triggeredScenarios,
                 'details' => $event->details,
                 'incomplete_checks' => $event->incompleteChecks,
