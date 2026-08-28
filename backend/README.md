@@ -88,6 +88,21 @@ docker compose logs backend --tail 50   # в логе видно "Running migrat
 `https://payments.example/checkout.js`) — ниже примеры бьют по ней напрямую,
 без ручной подготовки.
 
+**Новый тестовый запуск (генерация эталонных данных):**
+```bash
+curl -s -X POST http://localhost:8000/api/reference-payments -H "Content-Type: application/json" -d '{}'
+# → {"run_id":"...", "address":"test-addr-...", "amount":"...", "network":"BTC", "allowed_scripts":["https://payments.example/checkout.js"]}
+
+curl -s -X POST http://localhost:8000/api/reference-payments -H "Content-Type: application/json" -d '{"network": "ETH"}'
+# → network остаётся "ETH", остальное сгенерировано (например address вида "0x" + 40 hex-символов)
+```
+
+**Получить эталон повторно:**
+```bash
+curl -s http://localhost:8000/api/reference-payments/<run_id из POST выше>
+# → тот же JSON, что вернул POST; 404, если run_id не существует
+```
+
 **Подмены нет:**
 ```bash
 curl -s -X POST http://localhost:8000/api/checks -H "Content-Type: application/json" -d '{
@@ -97,7 +112,7 @@ curl -s -X POST http://localhost:8000/api/checks -H "Content-Type: application/j
   "copy_button_value": "addr-real", "address_after_watch_window": "addr-real",
   "page_scripts": ["https://payments.example/checkout.js"]
 }'
-# → {"result":"Подмена не обнаружена","triggered_scenarios":[],"details":[],"incomplete_checks":[]}
+# → {"result":"Подмена не обнаружена","triggered_scenarios":[],"details":[],"incomplete_checks":[],"incomplete_message":null}
 ```
 
 **Обнаружена подмена (сценарий 7.1 — адрес в QR ≠ адрес на странице):**
@@ -109,7 +124,7 @@ curl -s -X POST http://localhost:8000/api/checks -H "Content-Type: application/j
   "copy_button_value": "addr-real", "address_after_watch_window": "addr-real",
   "page_scripts": ["https://payments.example/checkout.js"]
 }'
-# → {"result":"Обнаружена подмена","triggered_scenarios":["7.1"],"details":[{"scenario":"7.1","expected":"addr-real","actual":"addr-EVIL"}],"incomplete_checks":[]}
+# → {"result":"Обнаружена подмена","triggered_scenarios":["7.1"],"details":[{"scenario":"7.1","expected":"addr-real","actual":"addr-EVIL"}],"incomplete_checks":[],"incomplete_message":null}
 ```
 
 **Неизвестный `run_id` (404, не 422 — тело запроса синтаксически валидно):**

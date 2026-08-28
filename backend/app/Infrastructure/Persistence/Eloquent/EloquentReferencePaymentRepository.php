@@ -35,4 +35,18 @@ final class EloquentReferencePaymentRepository implements ReferencePaymentReposi
             ),
         );
     }
+
+    public function create(DomainReferencePayment $payment): void
+    {
+        ReferencePaymentModel::query()->create([
+            'id' => $payment->id,
+            'address' => $payment->address->value(),
+            'amount' => $payment->amount->value(),
+            'network' => $payment->network->value(),
+            'allowed_scripts' => array_map(
+                static fn (ScriptSource $script): string => $script->value(),
+                $payment->allowedScripts,
+            ),
+        ]);
+    }
 }
