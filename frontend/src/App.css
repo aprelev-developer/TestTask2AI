@@ -35,11 +35,16 @@ input:focus,select:focus { box-shadow:0 0 0 2px var(--yellow); }
 .status-checkError .status-lamp { background:#d92020; box-shadow:0 0 12px #d92020; }
 .inline-retry { margin-top:10px; padding:6px 10px; border:3px outset #d8d2c3; background:#bfb8a8; font-weight:700; }
 .modal-backdrop { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:20px; background:rgba(0,0,0,.76); }
-.result-dialog { width:min(650px,100%); padding:24px; color:#eee8d8; background:#090909; border:6px ridge #d8d2c3; box-shadow:0 0 0 5px #a81717,14px 14px 0 #000; }
-.result-dialog h2 { margin:0 0 18px; padding:13px; color:#ff3737; border:2px solid #a81717; text-align:center; }
-.incomplete-message { color:var(--yellow); font-weight:700; }
-.result-detail { display:grid; gap:6px; margin:12px 0; padding:12px; border:1px solid #716f67; }
-.result-detail span { overflow-wrap:anywhere; }
+.result-dialog { width:min(650px,100%); padding:28px; color:#eee8d8; background:#090909; border:6px ridge #d8d2c3; box-shadow:14px 14px 0 #000; text-align:center; }
+.result-dialog h2 { margin:14px 0 18px; padding:13px; text-align:center; }
+.result-danger { box-shadow:0 0 0 5px #a81717,14px 14px 0 #000; }
+.result-danger h2 { color:#ff3737; border:2px solid #a81717; }
+.result-warning { box-shadow:0 0 0 5px #bd9414,14px 14px 0 #000; }
+.result-warning h2 { color:#ffd63a; border:2px solid #bd9414; }
+.result-unknown { box-shadow:0 0 0 5px #777,14px 14px 0 #000; }
+.result-unknown h2 { color:#eee8d8; border:2px solid #777; }
+.result-icon { display:grid; place-items:center; width:64px; height:64px; margin:0 auto; border:4px ridge #d8d2c3; font-size:2.7rem; font-weight:900; }
+.result-guidance { max-width:520px; margin:0 auto; line-height:1.55; }
 @keyframes blink { 50% { opacity:.25; } }
 footer { padding:9px 14px; color:#a9b2d1; border-top:1px solid #36416b; font-size:.72rem; text-align:right; }
 @media (max-width:800px) { .desktop-shell { width:calc(100% - 16px); margin:8px; } .workspace { grid-template-columns:1fr; padding:16px; } }
