@@ -1,32 +1,45 @@
-# React + TypeScript + Vite
+# ScamTest frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Тестовый интерфейс криптоплатежа в стиле Рунета 2000-х. Пользователь получает
+тестовые реквизиты и QR-код, может изменить сумму и нажать «Отправить».
+Frontend передаёт наблюдения в ScamTest API и показывает только понятный
+пользовательский статус: безопасный результат — в боковой панели, подозрение
+или подмена — в модальном предупреждении. Реальный перевод не выполняется.
 
-Currently, two official plugins are available:
+## Запуск
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Сначала поднимите backend по инструкции в корневом `README.md`, затем:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+На Windows при ограничении выполнения PowerShell-сценариев используйте
+`npm.cmd install` и `npm.cmd run dev`.
+
+- Интерфейс: http://localhost:5173
+- API: http://localhost:8000
+- Swagger: http://localhost:8000/api/documentation
+
+## Проверки
+
+```bash
+npm test
+npm run build
+npm run lint
+```
+
+Результаты автоматической и ручной проверки зафиксированы в `QA.md`.
+
+## Стек и структура
+
+- React 19, TypeScript, Vite;
+- `src/api` — контракт и запросы к backend;
+- `src/domain` — подготовка тестовых наблюдений;
+- `src/hooks` — состояние платёжного сценария;
+- `src/components` — QR-код и окно результата;
+- `src/**/*.test.*` — unit- и component-тесты.
+
+Проект является локальным демонстрационным стендом: адреса, QR-коды и операции
+тестовые, реальные средства и блокчейн не используются.
