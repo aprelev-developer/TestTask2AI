@@ -13,9 +13,9 @@
 
 | Участник | Зона ответственности | Результат |
 |---|---|---|
-| [@XRouDonX](https://github.com/XRouDonX) | Продуктовая аналитика | Описание продукта, границы MVP, `SPEC.md`, критерии приёмки и ревью спецификации |
-| [@aprelev-developer](https://github.com/aprelev-developer) | Backend-разработка | Laravel API, бизнес-логика антифрод-проверок, PostgreSQL, Docker, Swagger и backend-тесты |
-| [@miumeoww](https://github.com/miumeoww) | Frontend и QA | Дизайн и React/TypeScript-интерфейс, интеграция с API, frontend-тесты и ручная проверка |
+| [@XRouDonX](https://github.com/XRouDonX)<br>(Василий Фролов) | Продуктовая аналитика | Описание продукта, границы MVP, `SPEC.md`, критерии приёмки и ревью спецификации |
+| [@aprelev-developer](https://github.com/aprelev-developer)<br>(Андрей Апрелев) | Backend-разработка | Laravel API, бизнес-логика антифрод-проверок, PostgreSQL, Docker, Swagger и backend-тесты |
+| [@miumeoww](https://github.com/miumeoww)<br>(Виктория Мельникова) | Frontend и QA | Дизайн и React/TypeScript-интерфейс, интеграция с API, frontend-тесты и ручная проверка |
 
 Работа каждой роли велась в отдельной Git-ветке и объединяется через Pull
 Request в `develop`.
