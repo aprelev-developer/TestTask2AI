@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import type { Network } from './api/types'
+import { ResultDialog } from './components/ResultDialog'
 import { createQrPayload } from './domain/observations'
 import { usePaymentSimulation } from './hooks/usePaymentSimulation'
 import './App.css'
@@ -135,23 +136,7 @@ function App() {
         )}
       </div>
 
-      {status === 'result' && result && (
-        <div className="modal-backdrop" role="presentation">
-          <section className="result-dialog" role="dialog" aria-modal="true" aria-labelledby="result-title">
-            <h2 id="result-title">{result.result ?? result.incomplete_message}</h2>
-            {result.incomplete_message && result.result && <p className="incomplete-message">{result.incomplete_message}</p>}
-            {result.triggered_scenarios.length > 0 && <p>Сценарии: {result.triggered_scenarios.join(', ')}</p>}
-            {result.details.map((detail) => (
-              <div className="result-detail" key={detail.scenario}>
-                <strong>Сценарий {detail.scenario}</strong>
-                <span>Ожидалось: {detail.expected ?? '—'}</span>
-                <span>Обнаружено: {detail.actual ?? '—'}</span>
-              </div>
-            ))}
-            <button className="send-button" type="button" onClick={dismissResult}>ЗАКРЫТЬ</button>
-          </section>
-        </div>
-      )}
+      {status === 'result' && result && <ResultDialog result={result} onClose={dismissResult} />}
 
       <footer>SCAMTEST SECURITY TERMINAL · BUILD 2000.08</footer>
     </main>
