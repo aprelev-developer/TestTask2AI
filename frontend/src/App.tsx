@@ -37,6 +37,11 @@ function App() {
     setField('network', value)
   }
 
+  const refreshDetails = () => {
+    setCopyState('idle')
+    void refresh()
+  }
+
   return (
     <main className="desktop-shell">
       <header className="title-bar">
@@ -113,7 +118,7 @@ function App() {
                 <div className="qr-content">
                   <div className="qr-frame"><QRCodeSVG value={createQrPayload(qrValues)} size={154} level="M" /></div>
                   <p className="qr-caption">СКАНИРОВАТЬ В КОШЕЛЬКЕ</p>
-                  <button className="refresh-button" type="button" title="Получить новые тестовые реквизиты" onClick={refresh} disabled={isBusy}>
+                  <button className="refresh-button" type="button" title="Получить новые тестовые реквизиты" onClick={refreshDetails} disabled={isBusy}>
                     {status === 'refreshing' ? 'ЗАГРУЗКА...' : '↻ ОБНОВИТЬ'}
                   </button>
                 </div>

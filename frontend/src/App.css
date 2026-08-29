@@ -30,7 +30,8 @@ input:focus,select:focus { box-shadow:0 0 0 2px var(--yellow); }
 .qr-caption { margin:14px 0 18px; font-size:.82rem; font-weight:700; }
 .refresh-button { padding:10px 18px; }
 .idle-status { display:flex; align-items:center; gap:16px; padding:24px; } .idle-status strong { color:#176e0c; } .idle-status p { margin:5px 0 0; font-size:.82rem; }
-.status-lamp { width:26px; height:26px; flex:0 0 auto; border:3px inset #d8d2c3; background:var(--green); box-shadow:0 0 12px #3dcc2a; }
+.status-lamp { width:26px; height:26px; flex:0 0 auto; border:3px inset #d8d2c3; background:#71809a; box-shadow:0 0 8px #71809a; }
+.status-cleanResult .status-lamp { background:var(--green); box-shadow:0 0 12px #3dcc2a; }
 .status-checking .status-lamp { background:var(--yellow); box-shadow:0 0 12px var(--yellow); animation:blink .7s steps(2,end) infinite; }
 .status-checkError .status-lamp { background:#d92020; box-shadow:0 0 12px #d92020; }
 .inline-retry { margin-top:10px; padding:6px 10px; border:3px outset #d8d2c3; background:#bfb8a8; font-weight:700; }

@@ -64,6 +64,7 @@ export function usePaymentSimulation(
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const busy = useRef(false)
   const mounted = useRef(true)
+  const activeCleanup = useRef<() => void>(() => undefined)
 
   const applyReference = useCallback((created: ReferencePayment) => {
     const values: PaymentValues = {
@@ -92,9 +93,9 @@ export function usePaymentSimulation(
     try {
       const created = await api.createReferencePayment({ allowed_scripts: getPageScripts() })
       if (mounted.current) applyReference(created)
-    } catch (caught) {
+    } catch {
       if (!mounted.current) return
-      setError(caught instanceof Error ? caught.message : 'Сервис проверки временно недоступен')
+      setError('Не удалось получить тестовые реквизиты. Проверьте подключение и повторите попытку.')
       setStatus('referenceError')
     } finally {
       busy.current = false
@@ -108,14 +109,17 @@ export function usePaymentSimulation(
       .then((created) => {
         if (mounted.current) applyReference(created)
       })
-      .catch((caught: unknown) => {
+      .catch(() => {
         if (!mounted.current) return
-        setError(caught instanceof Error ? caught.message : 'Сервис проверки временно недоступен')
+        setError('Не удалось получить тестовые реквизиты. Проверьте подключение и повторите попытку.')
         setStatus('referenceError')
       })
       .finally(() => { busy.current = false })
 
-    return () => { mounted.current = false }
+    return () => {
+      mounted.current = false
+      activeCleanup.current()
+    }
   }, [api, applyReference, getPageScripts])
 
   function setField<K extends keyof PaymentValues>(field: K, value: PaymentValues[K]) {
@@ -157,6 +161,7 @@ export function usePaymentSimulation(
           network: formValues.network,
           allowed_scripts: getPageScripts(),
         })
+        if (!mounted.current) return
         setReference(activeReference)
         setReferenceFingerprint(paymentFingerprint(formValues))
       }
@@ -166,25 +171,30 @@ export function usePaymentSimulation(
       setQrValues(observations.qrValues)
       setCopyButtonValue(observations.copyButtonValue)
 
-      if (scenario.kind === 'suspicion') cleanupDemoScript = attachDemoScript()
+      if (scenario.kind === 'suspicion') {
+        cleanupDemoScript = attachDemoScript()
+        activeCleanup.current = cleanupDemoScript
+      }
       if (scenario.kind === 'tampering' && scenario.scenario === '7.3') {
         setFormValues({ ...formValues, address: substitutedAddress(formValues.address) })
       }
 
       await wait(5000)
+      if (!mounted.current) return
       const response = await api.runCheck(
         buildCheckRequest(activeReference, scenario, getPageScripts()),
       )
       if (!mounted.current) return
       setResult(response)
       setStatus(response.result === 'Подмена не обнаружена' ? 'cleanResult' : 'result')
-    } catch (caught) {
+    } catch {
       if (!mounted.current) return
-      setError(caught instanceof Error ? caught.message : 'Сервис проверки временно недоступен')
+      setError('Проверку не удалось выполнить. Проверьте подключение и повторите попытку.')
       setResult(null)
       setStatus('checkError')
     } finally {
       cleanupDemoScript()
+      activeCleanup.current = () => undefined
       if (mounted.current) setFormValues(originalValues)
       busy.current = false
     }

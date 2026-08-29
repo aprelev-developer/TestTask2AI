@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import type { CheckResult } from '../api/types'
 
 interface ResultDialogProps {
@@ -34,6 +35,20 @@ function presentationFor(result: CheckResult) {
 
 export function ResultDialog({ result, onClose }: ResultDialogProps) {
   const presentation = presentationFor(result)
+  const closeButton = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    closeButton.current?.focus()
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape)
+      previousFocus?.focus()
+    }
+  }, [onClose])
 
   return (
     <div className="modal-backdrop" role="presentation">
@@ -41,7 +56,7 @@ export function ResultDialog({ result, onClose }: ResultDialogProps) {
         <span className="result-icon" aria-hidden="true">{presentation.icon}</span>
         <h2 id="result-title">{presentation.title}</h2>
         <p className="result-guidance">{presentation.message}</p>
-        <button className="send-button" type="button" onClick={onClose}>ВЕРНУТЬСЯ К РЕКВИЗИТАМ</button>
+        <button ref={closeButton} className="send-button" type="button" onClick={onClose}>ВЕРНУТЬСЯ К РЕКВИЗИТАМ</button>
       </section>
     </div>
   )

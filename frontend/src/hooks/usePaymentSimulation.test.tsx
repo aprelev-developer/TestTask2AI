@@ -83,6 +83,6 @@ describe('usePaymentSimulation', () => {
     await act(async () => result.current.submit())
     expect(result.current.status).toBe('checkError')
     expect(result.current.result).toBeNull()
-    expect(result.current.error).toBe('Backend offline')
+    expect(result.current.error).toBe('Проверку не удалось выполнить. Проверьте подключение и повторите попытку.')
   })
 })
