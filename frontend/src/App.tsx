@@ -5,14 +5,24 @@ import './App.css'
 const initialAddress = 'TQ7mN9xK2pL4vR8sA6dF1hJ3cB5eG7yU'
 
 function App() {
-  const [address, setAddress] = useState(initialAddress)
+  const [address] = useState(initialAddress)
   const [amount, setAmount] = useState('50000')
   const [network, setNetwork] = useState('TRX')
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
 
   const qrValue = useMemo(
     () => JSON.stringify({ address, amount, network }),
     [address, amount, network],
   )
+
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(address)
+      setCopyState('copied')
+    } catch {
+      setCopyState('failed')
+    }
+  }
 
   return (
     <main className="desktop-shell">
@@ -25,10 +35,17 @@ function App() {
         <section className="window payment-window" aria-labelledby="payment-title">
           <h2 id="payment-title" className="window-title">ПЕРЕВОД СРЕДСТВ</h2>
           <div className="form-body">
-            <label className="field">
+            <div className="field recipient-field">
               <span>Адрес получателя</span>
-              <input value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="off" />
-            </label>
+              <div className="recipient-card">
+                <strong>{address}</strong>
+                <button className="copy-button" type="button" onClick={copyAddress}>СКОПИРОВАТЬ</button>
+              </div>
+              <small className={`copy-message ${copyState}`} aria-live="polite">
+                {copyState === 'copied' && 'Адрес скопирован'}
+                {copyState === 'failed' && 'Не удалось скопировать адрес'}
+              </small>
+            </div>
             <div className="field-row">
               <label className="field">
                 <span>Сумма</span>
@@ -53,10 +70,7 @@ function App() {
             <h2 id="qr-title" className="window-title">РЕКВИЗИТЫ</h2>
             <div className="qr-content">
               <div className="qr-frame"><QRCodeSVG value={qrValue} size={154} level="M" /></div>
-              <div className="address-preview">
-                <span>АКТИВНЫЙ КОШЕЛЁК</span>
-                <strong>{address || '—'}</strong>
-              </div>
+              <p className="qr-caption">СКАНИРОВАТЬ В КОШЕЛЬКЕ</p>
               <button className="refresh-button" type="button" title="Получить новые тестовые реквизиты">↻ ОБНОВИТЬ</button>
             </div>
           </section>
