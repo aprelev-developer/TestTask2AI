@@ -7,6 +7,8 @@ button,input,select { font:inherit; } button,select { cursor:pointer; }
 .title-bar { display:flex; align-items:center; justify-content:space-between; min-height:58px; padding:8px 18px; border-bottom:3px ridge #d8d2c3; }
 .title-bar h1 { margin:0; font-size:clamp(1.45rem,3vw,2.25rem); } .window-controls { font-size:1.4rem; word-spacing:.4rem; }
 .workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(340px,.92fr); gap:22px; padding:38px; }
+.connection-window { grid-column:1/-1; min-height:320px; }
+.connection-content { display:grid; place-items:center; align-content:center; gap:16px; min-height:250px; padding:28px; text-align:center; }
 .right-column { display:grid; gap:22px; } .window { border:4px ridge #e3dece; background:var(--paper); box-shadow:7px 7px 0 #000; }
 .window-title { margin:0; padding:12px 18px; border-bottom:3px ridge #e3dece; font-size:1.35rem; } .form-body,.qr-content { padding:26px; }
 .field { display:grid; gap:8px; margin-bottom:22px; font-weight:700; text-transform:uppercase; } .field>span { font-size:1.05rem; }

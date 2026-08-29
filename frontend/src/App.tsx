@@ -1,14 +1,58 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import { createReferencePayment } from './api/client'
+import type { Network, ReferencePayment } from './api/types'
 import './App.css'
 
-const initialAddress = 'TQ7mN9xK2pL4vR8sA6dF1hJ3cB5eG7yU'
-
 function App() {
-  const [address] = useState(initialAddress)
-  const [amount, setAmount] = useState('50000')
-  const [network, setNetwork] = useState('TRX')
+  const [reference, setReference] = useState<ReferencePayment | null>(null)
+  const [amount, setAmount] = useState('')
+  const [network, setNetwork] = useState<Network>('BTC')
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
+
+  const address = reference?.address ?? ''
+
+  const loadReference = useCallback(async () => {
+    setIsLoading(true)
+    setLoadError(false)
+    setCopyState('idle')
+    try {
+      const payment = await createReferencePayment()
+      setReference(payment)
+      setAmount(payment.amount)
+      setNetwork(payment.network)
+    } catch {
+      setReference(null)
+      setLoadError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    let isActive = true
+
+    void createReferencePayment()
+      .then((payment) => {
+        if (!isActive) return
+        setReference(payment)
+        setAmount(payment.amount)
+        setNetwork(payment.network)
+      })
+      .catch(() => {
+        if (!isActive) return
+        setLoadError(true)
+      })
+      .finally(() => {
+        if (isActive) setIsLoading(false)
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   const qrValue = useMemo(
     () => JSON.stringify({ address, amount, network }),
@@ -32,6 +76,24 @@ function App() {
       </header>
 
       <div className="workspace">
+        {!reference && (
+          <section className="window connection-window" aria-live="polite">
+            <h2 className="window-title">СОЕДИНЕНИЕ С BACKEND</h2>
+            <div className="connection-content">
+              {isLoading && <strong>ЗАГРУЗКА РЕКВИЗИТОВ...</strong>}
+              {loadError && (
+                <>
+                  <strong>Не удалось получить тестовые реквизиты</strong>
+                  <p>Проверьте, что backend запущен на порту 8000.</p>
+                  <button className="refresh-button" type="button" onClick={loadReference}>ПОВТОРИТЬ</button>
+                </>
+              )}
+            </div>
+          </section>
+        )}
+
+        {reference && (
+          <>
         <section className="window payment-window" aria-labelledby="payment-title">
           <h2 id="payment-title" className="window-title">ПЕРЕВОД СРЕДСТВ</h2>
           <div className="form-body">
@@ -53,7 +115,7 @@ function App() {
               </label>
               <label className="field network-field">
                 <span>Сеть</span>
-                <select value={network} onChange={(event) => setNetwork(event.target.value)}>
+                <select value={network} onChange={(event) => setNetwork(event.target.value as Network)}>
                   <option value="BTC">BTC</option>
                   <option value="ETH">ETH</option>
                   <option value="TRX">TRX</option>
@@ -71,7 +133,9 @@ function App() {
             <div className="qr-content">
               <div className="qr-frame"><QRCodeSVG value={qrValue} size={154} level="M" /></div>
               <p className="qr-caption">СКАНИРОВАТЬ В КОШЕЛЬКЕ</p>
-              <button className="refresh-button" type="button" title="Получить новые тестовые реквизиты">↻ ОБНОВИТЬ</button>
+              <button className="refresh-button" type="button" title="Получить новые тестовые реквизиты" onClick={loadReference} disabled={isLoading}>
+                {isLoading ? 'ЗАГРУЗКА...' : '↻ ОБНОВИТЬ'}
+              </button>
             </div>
           </section>
 
@@ -83,6 +147,8 @@ function App() {
             </div>
           </section>
         </aside>
+          </>
+        )}
       </div>
       <footer>SCAMTEST SECURITY TERMINAL · BUILD 2000.08</footer>
     </main>
